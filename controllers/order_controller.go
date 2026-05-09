@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"chefskiss-backend/config"
 	"chefskiss-backend/models"
@@ -9,11 +10,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func isValidPickupDate(date time.Time) bool {
+	weekday := date.Weekday()
+
+	if weekday == time.Tuesday || weekday == time.Wednesday || weekday == time.Thursday {
+		return true
+	}
+
+	return false
+}
+
 func CreateOrder(c *gin.Context) {
 	var input models.Order
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data yang dikirim tidak lengkap"})
+		return
+	}
+
+	// Cek hari untuk order
+	if !isValidPickupDate(input.PickupDate) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Hari pengambilan tidak valid! Pre-order hanya tersedia untuk hari Selasa, Rabu, dan Kamis.",
+		})
 		return
 	}
 
