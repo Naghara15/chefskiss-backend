@@ -6,6 +6,7 @@ import (
 
 	"chefskiss-backend/config"
 	"chefskiss-backend/models"
+	"chefskiss-backend/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -63,6 +64,7 @@ func CreateOrder(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan pesanan"})
 		return
 	}
+	go services.SendEmailReceipt(input)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Pesanan berhasil dicatat dengan aman!",

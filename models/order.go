@@ -6,6 +6,7 @@ import "time"
 type Order struct {
 	ID         uint        `gorm:"primaryKey" json:"id"`
 	Customer   string      `gorm:"size:255;not null" json:"customer_name" binding:"required"`
+	CustomerEmail string      `gorm:"size:255;not null" json:"customer_email" binding:"required,email"`
 	PickupDate time.Time   `gorm:"type:date;not null" json:"pickup_date" binding:"required"`
 	TotalPrice float64     `json:"total_price"`
 	CreatedAt  time.Time   `json:"created_at"`
