@@ -90,3 +90,38 @@ func GetTopRatings(c *gin.Context) {
 		"data":   ratings,
 	})
 }
+
+// GetAllMenuAverages mengambil data rata-rata rating untuk SEMUA menu
+func GetAllMenuAverages(c *gin.Context) {
+	// Struct khusus untuk menampung hasil query join
+	type MenuAverage struct {
+		MenuID  string  `json:"menu_id"`
+		Name    string  `json:"name"`
+		Average float64 `json:"average"`
+		Count   int64   `json:"total_reviews"`
+	}
+
+	var results []MenuAverage
+
+	// Query SQL menggunakan GORM:
+	// 1. Ambil data dari tabel menus
+	// 2. Lakukan LEFT JOIN ke tabel menu_ratings
+	// 3. Hitung AVG dan COUNT
+	// 4. Kelompokkan berdasarkan ID dan Nama menu (GROUP BY)
+	err := config.DB.Table("menus").
+		Select("menus.id as menu_id, menus.name, COALESCE(AVG(menu_ratings.review), 0) as average, COUNT(menu_ratings.id) as count").
+		Joins("LEFT JOIN menu_ratings ON menus.id = menu_ratings.menu_id").
+		Group("menus.id, menus.name").
+		Scan(&results).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data rating semua menu"})
+		return
+	}
+
+	// Berikan response sukses
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Berhasil mengambil rata-rata rating semua menu",
+		"data":    results,
+	})
+}

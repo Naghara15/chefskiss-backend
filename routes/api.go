@@ -14,6 +14,7 @@ func SetupRoutes(r *gin.Engine) {
 
 		// Rating
 		api.POST("/ratings", controllers.SubmitRating)
+		api.GET("/ratings/average/all", controllers.GetAllMenuAverages)
 		api.GET("/ratings/average/:menuId", controllers.GetAverageRating)
 		api.GET("/ratings/top", controllers.GetTopRatings)
 	}
