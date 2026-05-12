@@ -23,6 +23,7 @@ func main() {
 		&models.Menu{},
 		&models.Order{},
 		&models.OrderItem{},
+		&models.MenuRating{},
 	)
 	
 	if err != nil {

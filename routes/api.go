@@ -11,5 +11,8 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		// Fitur order
 		api.POST("/orders", controllers.CreateOrder)
+
+		// 
+		api.POST("/ratings", controllers.SubmitRating)
 	}
 }
