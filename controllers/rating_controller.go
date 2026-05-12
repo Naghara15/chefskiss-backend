@@ -66,3 +66,27 @@ func GetAverageRating(c *gin.Context) {
 		"data":    result,
 	})
 }
+
+func GetTopRatings(c *gin.Context) {
+	var ratings []models.MenuRating
+
+	// 1. Query ke database dengan filter dan randomizer
+	err := config.DB.Preload("Menu"). // Ambil detail menu terkait
+		Where("review = ?", 5).        // Hanya bintang 5
+		Where("note <> '' AND note IS NOT NULL"). // Note tidak boleh kosong atau null
+		Order("RANDOM()").             // Fungsi random bawaan PostgreSQL
+		Limit(5).                      // Batasi maksimal 5 data
+		Find(&ratings).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data testimoni"})
+		return
+	}
+
+	// 2. Berikan response
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"count":  len(ratings),
+		"data":   ratings,
+	})
+}
