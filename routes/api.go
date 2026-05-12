@@ -12,7 +12,8 @@ func SetupRoutes(r *gin.Engine) {
 		// Fitur order
 		api.POST("/orders", controllers.CreateOrder)
 
-		// 
+		// Rating
 		api.POST("/ratings", controllers.SubmitRating)
+		api.GET("/ratings/average/:menuId", controllers.GetAverageRating)
 	}
 }

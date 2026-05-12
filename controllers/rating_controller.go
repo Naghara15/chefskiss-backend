@@ -38,3 +38,31 @@ func SubmitRating(c *gin.Context) {
 		"data":    input,
 	})
 }
+
+func GetAverageRating(c *gin.Context) {
+	// Ambil menu_id dari URL parameter (contoh: /api/ratings/average/m1)
+	menuID := c.Param("menuId")
+
+	// Kita buat struct sementara untuk menampung hasil perhitungan dari database
+	var result struct {
+		Average float64 `json:"average"`
+		Count   int64   `json:"total_reviews"`
+	}
+
+	// Gunakan fungsi agregasi bawaan database (AVG dan COUNT) untuk performa maksimal
+	err := config.DB.Model(&models.MenuRating{}).
+		Select("COALESCE(AVG(review), 0) as average, COUNT(id) as count").
+		Where("menu_id = ?", menuID).
+		Scan(&result).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghitung rata-rata rating"})
+		return
+	}
+
+	// Berikan response lengkap
+	c.JSON(http.StatusOK, gin.H{
+		"menu_id": menuID,
+		"data":    result,
+	})
+}
